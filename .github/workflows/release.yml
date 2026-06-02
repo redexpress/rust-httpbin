@@ -30,7 +30,32 @@ jobs:
 
       - run: cargo build --release --target ${{ matrix.target }}
 
+      - name: rename binary
+        shell: bash
+        run: |
+          cd target/${{ matrix.target }}/release
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            cp axum-httpbin.exe axum-httpbin-${{ matrix.target }}.exe
+          else
+            cp axum-httpbin axum-httpbin-${{ matrix.target }}
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
           name: axum-httpbin-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/axum-httpbin${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+          path: target/${{ matrix.target }}/release/axum-httpbin-${{ matrix.target }}*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: axum-httpbin-*
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: axum-httpbin-*
