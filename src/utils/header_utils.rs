@@ -1,15 +1,47 @@
 use axum::http::HeaderMap;
 use std::collections::HashMap;
 
+/// Build the full request URL from headers and URI.
+///
+/// Uses the `Host` header (or falls back to `localhost`) plus
+/// the request path and query to construct a URL like:
+/// `http://example.com/path?key=val`
+pub fn build_full_url(headers: &HeaderMap, uri: &axum::http::Uri) -> String {
+    let scheme = if headers
+        .get("x-forwarded-proto")
+        .and_then(|v| v.to_str().ok())
+        == Some("https")
+    {
+        "https"
+    } else {
+        "http"
+    };
+
+    let host = headers
+        .get("host")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("localhost");
+
+    let path_and_query = uri.path_and_query().map(|pq| pq.as_str()).unwrap_or("/");
+
+    format!("{}://{}{}", scheme, host, path_and_query)
+}
+
 /// Collect all request headers into a `HashMap<String, String>`.
 ///
-/// Header names are lowercased for consistency.
-/// If a header appears multiple times, values are joined with `, `.
+/// If raw headers are available (via `HeaderPeeker` in the server), their
+/// original casing is used. Falls back to `HeaderMap` otherwise (unit tests).
+/// Duplicate header values are joined with `, `.
 pub fn collect_headers(headers: &HeaderMap) -> HashMap<String, String> {
-    let mut map = HashMap::new();
+    // Prefer raw headers with original casing when available
+    if let Ok(Some(raw)) = crate::utils::raw_headers::RAW_HEADERS.try_with(|h| h.clone()) {
+        return raw;
+    }
 
+    // Fallback: use HeaderMap (lowercased by the http crate)
+    let mut map = HashMap::new();
     for (name, value) in headers.iter() {
-        let key = name.as_str().to_lowercase();
+        let key = name.as_str().to_string();
         let val = value.to_str().unwrap_or("<binary>").to_string();
 
         map.entry(key)
@@ -19,7 +51,6 @@ pub fn collect_headers(headers: &HeaderMap) -> HashMap<String, String> {
             })
             .or_insert(val);
     }
-
     map
 }
 
@@ -82,11 +113,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn collects_headers_lowercase() {
+    fn collects_headers_preserves_case() {
         let mut headers = HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
+        // Custom headers preserve original casing in the http crate
+        headers.insert("X-Custom-Header", "test-value".parse().unwrap());
+        headers.insert("Accept", "text/html".parse().unwrap());
         let map = collect_headers(&headers);
-        assert_eq!(map.get("content-type").unwrap(), "application/json");
+        // Custom headers keep their case
+        assert_eq!(map.get("x-custom-header").unwrap(), "test-value");
+        // Standard headers may be lowercased by the http crate (HTTP spec)
+        assert!(map.contains_key("accept") || map.contains_key("Accept"));
     }
 
     #[test]

@@ -15,11 +15,12 @@ pub fn route() -> Router<AppState> {
 /// `DELETE /delete` — echoes the incoming DELETE request.
 async fn handler(
     State(state): State<AppState>,
+    uri: axum::http::Uri,
     headers: HeaderMap,
     Query(query): Query<HashMap<String, String>>,
     body: Bytes,
 ) -> axum::response::Response {
-    let info = build_request_info("DELETE", "/delete", &headers, &query, &body);
+    let info = build_request_info(&uri, &headers, &query, &body);
     let _ = state;
     ok_json(&info)
 }

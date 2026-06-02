@@ -11,6 +11,7 @@ async fn get_echoes_request() {
     let req = Request::builder()
         .method(Method::GET)
         .uri("/get?foo=bar")
+        .header("Host", "example.com")
         .header("x-custom", "test-value")
         .body(Body::empty())
         .unwrap();
@@ -23,9 +24,12 @@ async fn get_echoes_request() {
         .unwrap();
     let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
 
-    assert_eq!(json["method"], "GET");
+    assert_eq!(json["url"], "http://example.com/get?foo=bar");
     assert_eq!(json["args"]["foo"], "bar");
     assert_eq!(json["headers"]["x-custom"], "test-value");
+
+    // method, json, data, form, files must NOT be present when empty
+    assert!(json.get("method").is_none(), "method should not be present");
 }
 
 #[tokio::test]
@@ -34,6 +38,7 @@ async fn post_echoes_body() {
     let req = Request::builder()
         .method(Method::POST)
         .uri("/post")
+        .header("Host", "example.com")
         .header("content-type", "application/json")
         .body(Body::from(r#"{"key":"value"}"#))
         .unwrap();
@@ -46,8 +51,9 @@ async fn post_echoes_body() {
         .unwrap();
     let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
 
-    assert_eq!(json["method"], "POST");
+    assert_eq!(json["url"], "http://example.com/post");
     assert_eq!(json["json"]["key"], "value");
+    assert!(json.get("method").is_none(), "method should not be present");
 }
 
 #[tokio::test]

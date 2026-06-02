@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use crate::models::request::RequestInfo;
 use crate::state::AppState;
 use crate::utils::client_ip::client_ip;
-use crate::utils::header_utils::collect_headers;
+use crate::utils::header_utils::{build_full_url, collect_headers};
 use crate::utils::json_utils::{body_as_string, parse_json_value};
 use crate::utils::response_utils::ok_json;
 
@@ -18,18 +18,18 @@ pub fn route() -> Router<AppState> {
 /// `POST /post` — echoes the incoming request including the body.
 async fn handler(
     State(state): State<AppState>,
+    uri: axum::http::Uri,
     headers: HeaderMap,
     Query(query): Query<HashMap<String, String>>,
     body: Bytes,
 ) -> axum::response::Response {
-    let info = build_request_info("POST", "/post", &headers, &query, &body);
+    let info = build_request_info(&uri, &headers, &query, &body);
     let _ = state;
     ok_json(&info)
 }
 
 pub(crate) fn build_request_info(
-    method: &str,
-    url: &str,
+    uri: &axum::http::Uri,
     headers: &HeaderMap,
     query: &HashMap<String, String>,
     body: &Bytes,
@@ -52,14 +52,12 @@ pub(crate) fn build_request_info(
     };
 
     RequestInfo {
-        method: method.to_string(),
-        url: url.to_string(),
+        url: build_full_url(headers, uri),
         headers: collect_headers(headers),
         origin: client_ip(headers, None),
         args: query.clone(),
         json,
         data,
-        form: HashMap::new(),
-        files: HashMap::new(),
+        ..Default::default()
     }
 }

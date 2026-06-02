@@ -71,6 +71,7 @@ async fn anything_echoes_request() {
     let req = Request::builder()
         .method(Method::POST)
         .uri("/anything/some/path?q=1")
+        .header("Host", "example.com")
         .header("content-type", "text/plain")
         .body(Body::from("hello world"))
         .unwrap();
@@ -82,6 +83,7 @@ async fn anything_echoes_request() {
         .await
         .unwrap();
     let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
-    assert_eq!(json["method"], "POST");
+    assert_eq!(json["url"], "http://example.com/anything/some/path?q=1");
     assert_eq!(json["data"], "hello world");
+    assert!(json.get("method").is_none(), "method should not be present");
 }

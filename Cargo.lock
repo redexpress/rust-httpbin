@@ -82,6 +82,8 @@ dependencies = [
  "axum",
  "base64",
  "futures",
+ "hyper",
+ "hyper-util",
  "serde",
  "serde_json",
  "tokio",

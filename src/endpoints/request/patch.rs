@@ -15,11 +15,12 @@ pub fn route() -> Router<AppState> {
 /// `PATCH /patch` — echoes the incoming PATCH request including the body.
 async fn handler(
     State(state): State<AppState>,
+    uri: axum::http::Uri,
     headers: HeaderMap,
     Query(query): Query<HashMap<String, String>>,
     body: Bytes,
 ) -> axum::response::Response {
-    let info = build_request_info("PATCH", "/patch", &headers, &query, &body);
+    let info = build_request_info(&uri, &headers, &query, &body);
     let _ = state;
     ok_json(&info)
 }

@@ -4,22 +4,19 @@ use std::collections::HashMap;
 /// A reflection of the incoming HTTP request.
 ///
 /// Used by `/get`, `/post`, `/put`, `/patch`, `/delete`, and `/anything`.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct RequestInfo {
-    /// HTTP method (GET, POST, …)
-    pub method: String,
-
-    /// Request URL path + query
+    /// Full request URL (scheme + host + path + query)
     pub url: String,
 
-    /// Request headers as a map (lowercased keys)
+    /// Request headers as a map (original casing)
     pub headers: HashMap<String, String>,
 
     /// The origin IP address
     pub origin: String,
 
     /// Query string parameters
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    #[serde(default)]
     pub args: HashMap<String, String>,
 
     /// JSON body, if submitted and parseable

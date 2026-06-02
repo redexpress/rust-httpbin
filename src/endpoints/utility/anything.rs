@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use crate::models::request::RequestInfo;
 use crate::state::AppState;
 use crate::utils::client_ip::client_ip;
-use crate::utils::header_utils::collect_headers;
+use crate::utils::header_utils::{build_full_url, collect_headers};
 use crate::utils::json_utils::{body_as_string, parse_json_value};
 use crate::utils::response_utils::ok_json;
 
@@ -20,7 +20,6 @@ pub fn route() -> Router<AppState> {
 /// `ANY /anything[/...]` — catch-all that echoes the entire request.
 async fn handler(
     State(_state): State<AppState>,
-    method: axum::http::Method,
     uri: axum::http::Uri,
     headers: HeaderMap,
     Query(query): Query<HashMap<String, String>>,
@@ -44,14 +43,12 @@ async fn handler(
     };
 
     ok_json(&RequestInfo {
-        method: method.to_string(),
-        url: uri.to_string(),
+        url: build_full_url(&headers, &uri),
         headers: collect_headers(&headers),
         origin: client_ip(&headers, None),
         args: query,
         json,
         data,
-        form: HashMap::new(),
-        files: HashMap::new(),
+        ..Default::default()
     })
 }
