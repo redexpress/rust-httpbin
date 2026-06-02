@@ -1,5 +1,5 @@
 use axum::extract::State;
-use axum::{Router, routing::get};
+use axum::{routing::get, Router};
 
 use crate::models::response::UuidResponse;
 use crate::state::AppState;

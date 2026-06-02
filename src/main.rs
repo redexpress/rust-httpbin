@@ -25,7 +25,10 @@ async fn main() {
         .await
         .expect("failed to bind to 127.0.0.1:3000");
 
-    info!("Axum Httpbin listening on http://{}", listener.local_addr().unwrap());
+    info!(
+        "Axum Httpbin listening on http://{}",
+        listener.local_addr().unwrap()
+    );
 
     // Manual accept loop — peeks at raw TCP bytes to preserve header casing
     loop {

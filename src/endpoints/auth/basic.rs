@@ -1,6 +1,6 @@
 use axum::extract::{Path, State};
 use axum::http::HeaderMap;
-use axum::{Router, routing::get};
+use axum::{routing::get, Router};
 use serde::Serialize;
 
 use crate::error::AppError;

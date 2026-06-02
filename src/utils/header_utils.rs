@@ -24,7 +24,7 @@ pub fn build_full_url(headers: &HeaderMap, uri: &axum::http::Uri) -> String {
 
     let path_and_query = uri.path_and_query().map(|pq| pq.as_str()).unwrap_or("/");
 
-    format!("{}://{}{}", scheme, host, path_and_query)
+    format!("{scheme}://{host}{path_and_query}")
 }
 
 /// Collect all request headers into a `HashMap<String, String>`.
@@ -61,10 +61,7 @@ pub fn parse_query(query: Option<&str>) -> HashMap<String, String> {
     if let Some(qs) = query {
         for pair in qs.split('&') {
             if let Some((k, v)) = pair.split_once('=') {
-                map.insert(
-                    url_decode(k),
-                    url_decode(v),
-                );
+                map.insert(url_decode(k), url_decode(v));
             } else if !pair.is_empty() {
                 map.insert(url_decode(pair), String::new());
             }

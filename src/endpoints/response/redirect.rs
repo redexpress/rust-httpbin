@@ -1,6 +1,6 @@
 use axum::extract::{Query, State};
 use axum::http::{HeaderMap, StatusCode};
-use axum::{Router, routing::get};
+use axum::{routing::get, Router};
 use serde::Deserialize;
 
 use crate::error::AppError;
@@ -23,9 +23,9 @@ async fn handler(
     State(_state): State<AppState>,
     Query(params): Query<RedirectParams>,
 ) -> Result<(StatusCode, HeaderMap, ()), AppError> {
-    let url = params.url.ok_or_else(|| {
-        AppError::BadRequest("query parameter 'url' is required".into())
-    })?;
+    let url = params
+        .url
+        .ok_or_else(|| AppError::BadRequest("query parameter 'url' is required".into()))?;
 
     let status_code = params.status_code.unwrap_or(302);
     let status = match status_code {
@@ -36,9 +36,8 @@ async fn handler(
         308 => StatusCode::PERMANENT_REDIRECT,
         _ => {
             return Err(AppError::BadRequest(format!(
-                "unsupported redirect status code: {}. Supported: 301, 302, 303, 307, 308",
-                status_code
-            )))
+                "unsupported redirect status code: {status_code}. Supported: 301, 302, 303, 307, 308"
+            )));
         }
     };
 

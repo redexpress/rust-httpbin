@@ -3,8 +3,8 @@ pub(crate) mod redirect;
 pub(crate) mod status;
 pub(crate) mod stream;
 
-use axum::Router;
 use crate::state::AppState;
+use axum::Router;
 
 pub fn routes() -> Router<AppState> {
     Router::new()

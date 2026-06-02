@@ -1,5 +1,5 @@
 use axum::extract::{Path, State};
-use axum::{Router, routing::get};
+use axum::{routing::get, Router};
 use serde::Serialize;
 use std::time::Duration;
 
@@ -37,6 +37,6 @@ async fn handler(
 
     Ok(ok_json(&DelayResponse {
         delay_secs: secs,
-        message: format!("waited {:.3} seconds", secs),
+        message: format!("waited {secs:.3} seconds"),
     }))
 }

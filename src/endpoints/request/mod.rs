@@ -4,8 +4,8 @@ pub(crate) mod patch;
 pub(crate) mod post;
 pub(crate) mod put;
 
-use axum::Router;
 use crate::state::AppState;
+use axum::Router;
 
 pub fn routes() -> Router<AppState> {
     Router::new()

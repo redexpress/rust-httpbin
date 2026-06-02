@@ -1,6 +1,6 @@
 use axum::extract::{Path, State};
 use axum::response::sse::{Event, Sse};
-use axum::{Router, routing::get};
+use axum::{routing::get, Router};
 use futures::stream::{self, Stream, StreamExt};
 use std::convert::Infallible;
 use std::time::Duration;
@@ -27,7 +27,7 @@ async fn handler(
     }
 
     let stream = stream::iter(0..n).then(move |i| {
-        let url = format!("/stream/{}", n);
+        let url = format!("/stream/{n}");
         async move {
             tokio::time::sleep(Duration::from_millis(200)).await;
             let item = StreamItem { id: i, url };

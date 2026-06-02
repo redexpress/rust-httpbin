@@ -36,10 +36,9 @@ impl AppError {
 
     pub fn message(&self) -> &str {
         match self {
-            Self::BadRequest(m)
-            | Self::Unauthorized(m)
-            | Self::NotFound(m)
-            | Self::Internal(m) => m,
+            Self::BadRequest(m) | Self::Unauthorized(m) | Self::NotFound(m) | Self::Internal(m) => {
+                m
+            }
         }
     }
 }

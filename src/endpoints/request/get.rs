@@ -1,6 +1,6 @@
 use axum::extract::{Query, State};
 use axum::http::HeaderMap;
-use axum::{Router, routing::get};
+use axum::{routing::get, Router};
 use std::collections::HashMap;
 
 use crate::models::response::GetResponse;

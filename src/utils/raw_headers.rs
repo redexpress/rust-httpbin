@@ -69,7 +69,6 @@ impl<S> HeaderPeeker<S> {
 
         Ok((self, headers))
     }
-
 }
 
 // ── AsyncRead / AsyncWrite delegation ──────────────────────────────────────
@@ -105,17 +104,11 @@ impl<S: AsyncWrite + Unpin> AsyncWrite for HeaderPeeker<S> {
         Pin::new(&mut self.inner).poll_write(cx, buf)
     }
 
-    fn poll_flush(
-        mut self: Pin<&mut Self>,
-        cx: &mut Context<'_>,
-    ) -> Poll<io::Result<()>> {
+    fn poll_flush(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         Pin::new(&mut self.inner).poll_flush(cx)
     }
 
-    fn poll_shutdown(
-        mut self: Pin<&mut Self>,
-        cx: &mut Context<'_>,
-    ) -> Poll<io::Result<()>> {
+    fn poll_shutdown(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         Pin::new(&mut self.inner).poll_shutdown(cx)
     }
 }
@@ -132,10 +125,7 @@ pub struct InjectRawHeaders<S> {
 
 impl<S> InjectRawHeaders<S> {
     pub fn new(inner: S, raw_headers: HashMap<String, String>) -> Self {
-        Self {
-            inner,
-            raw_headers,
-        }
+        Self { inner, raw_headers }
     }
 }
 
@@ -157,11 +147,7 @@ where
         let raw = self.raw_headers.clone();
         let mut inner = self.inner.clone();
         let fut = inner.call(req);
-        Box::pin(async move {
-            RAW_HEADERS
-                .scope(Some(raw), fut)
-                .await
-        })
+        Box::pin(async move { RAW_HEADERS.scope(Some(raw), fut).await })
     }
 }
 
@@ -169,7 +155,9 @@ where
 
 /// Find the position just past `\r\n\r\n` (start of HTTP body).
 fn find_header_end(data: &[u8]) -> Option<usize> {
-    data.windows(4).position(|w| w == b"\r\n\r\n").map(|p| p + 4)
+    data.windows(4)
+        .position(|w| w == b"\r\n\r\n")
+        .map(|p| p + 4)
 }
 
 /// Parse HTTP/1.1 headers from raw bytes, preserving original casing.

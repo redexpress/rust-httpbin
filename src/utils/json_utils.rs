@@ -36,10 +36,7 @@ pub fn parse_form_body(body: &Bytes) -> std::collections::HashMap<String, String
             continue;
         }
         if let Some((k, v)) = pair.split_once('=') {
-            map.insert(
-                percent_decode(k).to_string(),
-                percent_decode(v).to_string(),
-            );
+            map.insert(percent_decode(k).to_string(), percent_decode(v).to_string());
         } else {
             map.insert(percent_decode(pair).to_string(), String::new());
         }

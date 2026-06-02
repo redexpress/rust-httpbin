@@ -1,7 +1,7 @@
 use axum::body::Bytes;
 use axum::extract::{Query, State};
 use axum::http::HeaderMap;
-use axum::{Router, routing::any};
+use axum::{routing::any, Router};
 use std::collections::HashMap;
 
 use crate::models::request::RequestInfo;

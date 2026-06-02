@@ -1,6 +1,6 @@
 use axum::extract::State;
 use axum::http::HeaderMap;
-use axum::{Router, routing::get};
+use axum::{routing::get, Router};
 use serde::Serialize;
 
 use crate::state::AppState;
@@ -17,10 +17,7 @@ struct UserAgentResponse {
 }
 
 /// `GET /user-agent` — returns the client's User-Agent header.
-async fn handler(
-    State(_state): State<AppState>,
-    headers: HeaderMap,
-) -> axum::response::Response {
+async fn handler(State(_state): State<AppState>, headers: HeaderMap) -> axum::response::Response {
     let ua = headers
         .get("user-agent")
         .and_then(|v| v.to_str().ok())

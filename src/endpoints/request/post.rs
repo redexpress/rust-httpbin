@@ -1,7 +1,7 @@
 use axum::body::Bytes;
 use axum::extract::{Query, State};
 use axum::http::HeaderMap;
-use axum::{Router, routing::post};
+use axum::{routing::post, Router};
 use std::collections::HashMap;
 
 use crate::models::request::RequestInfo;
@@ -103,7 +103,10 @@ mod tests {
         assert_eq!(json["json"]["key"], "value");
         assert_eq!(json["data"], "");
         assert!(json.get("form").is_some(), "form should always be present");
-        assert!(json.get("files").is_some(), "files should always be present");
+        assert!(
+            json.get("files").is_some(),
+            "files should always be present"
+        );
     }
 
     #[tokio::test]
