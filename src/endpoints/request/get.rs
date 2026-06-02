@@ -3,7 +3,7 @@ use axum::http::HeaderMap;
 use axum::{Router, routing::get};
 use std::collections::HashMap;
 
-use crate::models::request::RequestInfo;
+use crate::models::response::GetResponse;
 use crate::state::AppState;
 use crate::utils::client_ip::client_ip;
 use crate::utils::header_utils::{build_full_url, collect_headers};
@@ -20,12 +20,11 @@ async fn handler(
     headers: HeaderMap,
     Query(query): Query<HashMap<String, String>>,
 ) -> axum::response::Response {
-    ok_json(&RequestInfo {
+    ok_json(&GetResponse {
         url: build_full_url(&headers, &uri),
         headers: collect_headers(&headers),
         origin: client_ip(&headers, None),
         args: query,
-        ..Default::default()
     })
 }
 
@@ -54,13 +53,12 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn get_has_required_fields() {
+    async fn get_has_only_four_fields() {
         let app = test_app();
         let req = Request::builder()
             .method(Method::GET)
             .uri("/get?foo=bar")
             .header("Host", "example.com")
-            .header("User-Agent", "curl/8.0")
             .body(Body::empty())
             .unwrap();
 
@@ -70,18 +68,12 @@ mod tests {
             .unwrap();
         let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
 
-        // Must have exactly the fields httpbin.org returns
+        // Exactly 4 fields — matches httpbin.org/get
+        assert_eq!(json.as_object().unwrap().len(), 4);
         assert!(json.get("args").is_some(), "missing args");
         assert!(json.get("headers").is_some(), "missing headers");
         assert!(json.get("origin").is_some(), "missing origin");
         assert!(json.get("url").is_some(), "missing url");
-
-        // Must NOT have method, json, data, form, files when empty
-        assert!(json.get("method").is_none(), "method should not be present");
-        assert!(json.get("json").is_none(), "json should not be present when empty");
-        assert!(json.get("data").is_none(), "data should not be present when empty");
-        assert!(json.get("form").is_none(), "form should not be present when empty");
-        assert!(json.get("files").is_none(), "files should not be present when empty");
     }
 
     #[tokio::test]

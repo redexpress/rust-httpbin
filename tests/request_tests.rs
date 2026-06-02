@@ -28,8 +28,8 @@ async fn get_echoes_request() {
     assert_eq!(json["args"]["foo"], "bar");
     assert_eq!(json["headers"]["x-custom"], "test-value");
 
-    // method, json, data, form, files must NOT be present when empty
-    assert!(json.get("method").is_none(), "method should not be present");
+    // GET has only 4 fields — matches httpbin.org
+    assert_eq!(json.as_object().unwrap().len(), 4);
 }
 
 #[tokio::test]

@@ -8,7 +8,7 @@ use crate::models::request::RequestInfo;
 use crate::state::AppState;
 use crate::utils::client_ip::client_ip;
 use crate::utils::header_utils::{build_full_url, collect_headers};
-use crate::utils::json_utils::{body_as_string, parse_json_value};
+use crate::utils::json_utils::{body_as_string, parse_form_body, parse_json_value};
 use crate::utils::response_utils::ok_json;
 
 pub fn route() -> Router<AppState> {
@@ -30,16 +30,25 @@ async fn handler(
         .and_then(|v| v.to_str().ok())
         .unwrap_or("");
 
-    let json = if content_type.contains("application/json") {
+    let is_json = content_type.contains("application/json");
+    let is_form = content_type.contains("application/x-www-form-urlencoded");
+
+    let json = if is_json {
         parse_json_value(&body)
     } else {
         None
     };
 
-    let data = if json.is_none() {
-        body_as_string(&body)
+    let form = if is_form {
+        parse_form_body(&body)
     } else {
-        None
+        HashMap::new()
+    };
+
+    let data = if is_json || is_form {
+        String::new()
+    } else {
+        body_as_string(&body).unwrap_or_default()
     };
 
     ok_json(&RequestInfo {
@@ -49,6 +58,7 @@ async fn handler(
         args: query,
         json,
         data,
+        form,
         ..Default::default()
     })
 }

@@ -19,19 +19,19 @@ pub struct RequestInfo {
     #[serde(default)]
     pub args: HashMap<String, String>,
 
-    /// JSON body, if submitted and parseable
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// JSON body, if submitted and parseable (always present, null when not JSON)
+    #[serde(default)]
     pub json: Option<serde_json::Value>,
 
-    /// Raw body as a UTF-8 string (form data, plain text, …)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub data: Option<String>,
+    /// Raw body as a UTF-8 string (empty when form or json parsed)
+    #[serde(default)]
+    pub data: String,
 
     /// Form parameters, if submitted as `application/x-www-form-urlencoded`
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    #[serde(default)]
     pub form: HashMap<String, String>,
 
     /// Files submitted via multipart (filename → size in bytes)
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    #[serde(default)]
     pub files: HashMap<String, u64>,
 }

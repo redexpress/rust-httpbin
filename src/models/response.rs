@@ -39,3 +39,12 @@ pub struct StreamItem {
     pub id: usize,
     pub url: String,
 }
+
+/// Response for `GET /get` — matches httpbin.org's minimal shape.
+#[derive(Debug, Serialize)]
+pub struct GetResponse {
+    pub args: std::collections::HashMap<String, String>,
+    pub headers: std::collections::HashMap<String, String>,
+    pub origin: String,
+    pub url: String,
+}
