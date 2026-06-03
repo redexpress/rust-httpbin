@@ -10,7 +10,11 @@ pub fn route() -> Router<AppState> {
 }
 
 /// `GET /headers` — returns the request headers as JSON.
-async fn handler(State(_state): State<AppState>, headers: HeaderMap) -> axum::response::Response {
+#[utoipa::path(get, path = "/headers", responses((status = 200, description = "Return request headers")))]
+pub(crate) async fn handler(
+    State(_state): State<AppState>,
+    headers: HeaderMap,
+) -> axum::response::Response {
     let map = collect_headers(&headers);
     ok_json(&map)
 }

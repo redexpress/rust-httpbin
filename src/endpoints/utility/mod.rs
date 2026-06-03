@@ -1,9 +1,13 @@
 pub(crate) mod anything;
+pub(crate) mod image;
 pub(crate) mod uuid;
 
 use crate::state::AppState;
 use axum::Router;
 
 pub fn routes() -> Router<AppState> {
-    Router::new().merge(uuid::route()).merge(anything::route())
+    Router::new()
+        .merge(uuid::route())
+        .merge(anything::route())
+        .merge(image::route())
 }

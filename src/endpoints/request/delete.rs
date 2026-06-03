@@ -13,7 +13,8 @@ pub fn route() -> Router<AppState> {
 }
 
 /// `DELETE /delete` — echoes the incoming DELETE request.
-async fn handler(
+#[utoipa::path(delete, path = "/delete", request_body = String, responses((status = 200, description = "Echo the DELETE request")))]
+pub(crate) async fn handler(
     State(state): State<AppState>,
     uri: axum::http::Uri,
     headers: HeaderMap,

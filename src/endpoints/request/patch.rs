@@ -13,7 +13,8 @@ pub fn route() -> Router<AppState> {
 }
 
 /// `PATCH /patch` — echoes the incoming PATCH request including the body.
-async fn handler(
+#[utoipa::path(patch, path = "/patch", request_body = String, responses((status = 200, description = "Echo the PATCH request")))]
+pub(crate) async fn handler(
     State(state): State<AppState>,
     uri: axum::http::Uri,
     headers: HeaderMap,

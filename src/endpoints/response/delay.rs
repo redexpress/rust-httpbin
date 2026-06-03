@@ -20,7 +20,8 @@ struct DelayResponse {
 /// `GET /delay/:secs` — waits N seconds then responds.
 ///
 /// Max delay: 60 seconds. Returns 400 for negative or excessive values.
-async fn handler(
+#[utoipa::path(get, path = "/delay/{secs}", responses((status = 200, description = "Wait N seconds, then reply")))]
+pub(crate) async fn handler(
     State(_state): State<AppState>,
     Path(secs): Path<f64>,
 ) -> Result<axum::response::Response, AppError> {

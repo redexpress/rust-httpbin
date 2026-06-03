@@ -13,7 +13,8 @@ pub fn route() -> Router<AppState> {
 }
 
 /// `PUT /put` — echoes the incoming PUT request including the body.
-async fn handler(
+#[utoipa::path(put, path = "/put", request_body = String, responses((status = 200, description = "Echo the PUT request")))]
+pub(crate) async fn handler(
     State(state): State<AppState>,
     uri: axum::http::Uri,
     headers: HeaderMap,

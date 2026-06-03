@@ -14,7 +14,8 @@ pub fn route() -> Router<AppState> {
 }
 
 /// `GET /get` — echoes the incoming request.
-async fn handler(
+#[utoipa::path(get, path = "/get", responses((status = 200, description = "Echo the GET request")))]
+pub(crate) async fn handler(
     State(_state): State<AppState>,
     uri: axum::http::Uri,
     headers: HeaderMap,

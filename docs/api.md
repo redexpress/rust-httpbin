@@ -1,7 +1,11 @@
 # API Reference
 
-> Full endpoint documentation coming soon.
-> See the Swagger UI at `/swagger-ui` for interactive docs generated from source code.
+Start the server (`cargo run`) and:
+
+- Visit `http://127.0.0.1:3000/` for the interactive Swagger UI.
+- `GET http://127.0.0.1:3000/openapi.json` for the raw OpenAPI 3.x spec (importable into Postman / Insomnia / Bruno / Apifox).
+
+The spec is generated from the source code via [`utoipa`](https://crates.io/crates/utoipa); the source remains the single source of truth.
 
 ## Endpoints
 
@@ -46,3 +50,7 @@
 | `GET`  | `/uuid`         | Return a random UUIDv4    |
 | `ANY`  | `/anything`     | Echo the entire request   |
 | `ANY`  | `/anything/*`   | Echo with captured path   |
+| `GET`  | `/image`        | Return a PNG image (alias for `/image/png`) |
+| `GET`  | `/image/png`    | Return a PNG image        |
+| `GET`  | `/image/jpeg`   | Return a JPEG image       |
+| `GET`  | `/image/webp`   | Return a WebP image       |

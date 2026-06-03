@@ -17,7 +17,11 @@ struct UserAgentResponse {
 }
 
 /// `GET /user-agent` — returns the client's User-Agent header.
-async fn handler(State(_state): State<AppState>, headers: HeaderMap) -> axum::response::Response {
+#[utoipa::path(get, path = "/user-agent", responses((status = 200, description = "Return User-Agent string")))]
+pub(crate) async fn handler(
+    State(_state): State<AppState>,
+    headers: HeaderMap,
+) -> axum::response::Response {
     let ua = headers
         .get("user-agent")
         .and_then(|v| v.to_str().ok())

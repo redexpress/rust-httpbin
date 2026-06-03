@@ -17,7 +17,11 @@ struct IpResponse {
 }
 
 /// `GET /ip` — returns the client's IP address.
-async fn handler(State(_state): State<AppState>, headers: HeaderMap) -> axum::response::Response {
+#[utoipa::path(get, path = "/ip", responses((status = 200, description = "Return client IP")))]
+pub(crate) async fn handler(
+    State(_state): State<AppState>,
+    headers: HeaderMap,
+) -> axum::response::Response {
     let origin = client_ip(&headers, None);
     ok_json(&IpResponse { origin })
 }

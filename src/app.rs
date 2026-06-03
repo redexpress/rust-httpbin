@@ -1,5 +1,8 @@
 use axum::Router;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
+use crate::api::openapi::ApiDoc;
 use crate::endpoints;
 use crate::middleware::{access_log, request_id, trace};
 use crate::state::AppState;
@@ -23,6 +26,8 @@ pub fn build_app(state: AppState) -> Router {
         .merge(response_routes)
         .merge(auth_routes)
         .merge(utility_routes)
+        // Swagger UI at "/" + raw OpenAPI spec at "/openapi.json"
+        .merge(SwaggerUi::new("/").url("/openapi.json", ApiDoc::openapi()))
         // Middleware (layered outermost → runs first)
         .layer(axum::middleware::from_fn(trace::trace_layer))
         .layer(axum::middleware::from_fn(request_id::request_id_layer))

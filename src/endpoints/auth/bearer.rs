@@ -20,7 +20,8 @@ struct BearerResponse {
 /// `GET /bearer` — validates a Bearer token from the Authorization header.
 ///
 /// Returns 401 if the header is missing or doesn't start with `Bearer `.
-async fn handler(
+#[utoipa::path(get, path = "/bearer", responses((status = 200, description = "Validate Bearer token")))]
+pub(crate) async fn handler(
     State(_state): State<AppState>,
     headers: HeaderMap,
 ) -> Result<axum::response::Response, AppError> {

@@ -11,7 +11,7 @@ pub fn route() -> Router<AppState> {
 }
 
 #[derive(Deserialize)]
-struct RedirectParams {
+pub(crate) struct RedirectParams {
     url: Option<String>,
     status_code: Option<u16>,
 }
@@ -19,7 +19,8 @@ struct RedirectParams {
 /// `GET /redirect-to?url=...&status_code=...` — redirects to the given URL.
 ///
 /// Default status code: 302. Supports 301, 302, 303, 307, 308.
-async fn handler(
+#[utoipa::path(get, path = "/redirect-to", responses((status = 302, description = "Redirect to the given URL")))]
+pub(crate) async fn handler(
     State(_state): State<AppState>,
     Query(params): Query<RedirectParams>,
 ) -> Result<(StatusCode, HeaderMap, ()), AppError> {

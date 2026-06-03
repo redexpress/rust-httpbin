@@ -16,7 +16,8 @@ pub fn route() -> Router<AppState> {
 }
 
 /// `POST /post` — echoes the incoming request including the body.
-async fn handler(
+#[utoipa::path(post, path = "/post", request_body = String, responses((status = 200, description = "Echo the POST request")))]
+pub(crate) async fn handler(
     State(state): State<AppState>,
     uri: axum::http::Uri,
     headers: HeaderMap,

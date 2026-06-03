@@ -20,7 +20,8 @@ struct AuthResponse {
 /// `GET /basic-auth/:user/:passwd` — validates HTTP Basic auth credentials.
 ///
 /// Returns 401 if the `Authorization` header is missing or doesn't match.
-async fn handler(
+#[utoipa::path(get, path = "/basic-auth/{user}/{passwd}", responses((status = 200, description = "Validate HTTP Basic auth credentials")))]
+pub(crate) async fn handler(
     State(_state): State<AppState>,
     Path((user, passwd)): Path<(String, String)>,
     headers: HeaderMap,

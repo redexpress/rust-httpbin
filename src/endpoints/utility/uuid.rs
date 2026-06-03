@@ -10,7 +10,8 @@ pub fn route() -> Router<AppState> {
 }
 
 /// `GET /uuid` — returns a randomly-generated v4 UUID.
-async fn handler(State(_state): State<AppState>) -> axum::response::Response {
+#[utoipa::path(get, path = "/uuid", responses((status = 200, description = "Return a random UUIDv4")))]
+pub(crate) async fn handler(State(_state): State<AppState>) -> axum::response::Response {
     let id = uuid::Uuid::new_v4().to_string();
     ok_json(&UuidResponse { uuid: id })
 }

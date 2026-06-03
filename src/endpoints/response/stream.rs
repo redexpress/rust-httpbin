@@ -16,7 +16,8 @@ pub fn route() -> Router<AppState> {
 /// `GET /stream/:n` — streams N JSON objects via Server-Sent Events.
 ///
 /// Max 100 items. One item per ~200ms.
-async fn handler(
+#[utoipa::path(get, path = "/stream/{n}", responses((status = 200, description = "Stream N JSON objects via SSE")))]
+pub(crate) async fn handler(
     State(_state): State<AppState>,
     Path(n): Path<usize>,
 ) -> Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, AppError> {

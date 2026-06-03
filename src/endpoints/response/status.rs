@@ -12,7 +12,8 @@ pub fn route() -> Router<AppState> {
 /// `GET /status/:code` — returns the given HTTP status code.
 ///
 /// Valid range: 100–599. Returns 400 for out-of-range values.
-async fn handler(
+#[utoipa::path(get, path = "/status/{code}", responses((status = 200, description = "Return given HTTP status code")))]
+pub(crate) async fn handler(
     State(_state): State<AppState>,
     Path(code): Path<u16>,
 ) -> Result<(StatusCode, &'static str), AppError> {
