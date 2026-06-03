@@ -36,6 +36,13 @@ cargo clippy
 cargo test
 ```
 
+Or run the bundled CI mirror locally before pushing:
+
+```bash
+./build.sh        # fmt + clippy + test (full) + build --release
+./build.sh ci     # exact GitHub Actions parity (test --lib)
+```
+
 ## Design
 
 Feature-oriented structure, explicit dependencies, no enterprise patterns. See [docs/design.md](docs/design.md).
