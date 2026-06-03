@@ -1,4 +1,5 @@
 use axum::Router;
+use tower_http::compression::CompressionLayer;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -32,6 +33,8 @@ pub fn build_app(state: AppState) -> Router {
         .layer(axum::middleware::from_fn(trace::trace_layer))
         .layer(axum::middleware::from_fn(request_id::request_id_layer))
         .layer(axum::middleware::from_fn(access_log::access_log_layer))
+        // Outermost: compresses response bodies when client sends Accept-Encoding: gzip|br|deflate
+        .layer(CompressionLayer::new())
         // Shared state
         .with_state(state)
 }

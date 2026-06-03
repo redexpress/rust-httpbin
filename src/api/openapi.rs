@@ -4,7 +4,7 @@ use utoipa::OpenApi;
 #[openapi(
     info(
         title = "Axum Httpbin",
-        version = "0.1.0",
+        version = "0.2.0",
         description = "A lightweight HTTP testing service inspired by httpbin.org"
     ),
     paths(
@@ -16,21 +16,27 @@ use utoipa::OpenApi;
         crate::endpoints::inspect::headers::handler,
         crate::endpoints::inspect::ip::handler,
         crate::endpoints::inspect::user_agent::handler,
+        crate::endpoints::inspect::cookies::get_cookies,
+        crate::endpoints::inspect::cookies::set_cookies,
+        crate::endpoints::inspect::cookies::set_cookie_one,
+        crate::endpoints::inspect::cookies::delete_cookies,
         crate::endpoints::response::status::handler,
         crate::endpoints::response::delay::handler,
         crate::endpoints::response::redirect::handler,
         crate::endpoints::response::stream::handler,
+        crate::endpoints::response::response_headers::handler,
         crate::endpoints::auth::basic::handler,
         crate::endpoints::auth::bearer::handler,
         crate::endpoints::utility::uuid::handler,
         crate::endpoints::utility::image::serve_png,
         crate::endpoints::utility::image::serve_jpeg,
         crate::endpoints::utility::image::serve_webp,
+        crate::endpoints::utility::image::serve_svg,
     ),
     tags(
         (name = "request", description = "Echo request methods"),
-        (name = "inspect", description = "Header / IP / User-Agent inspection"),
-        (name = "response", description = "Status / Delay / Redirect / Stream control"),
+        (name = "inspect", description = "Header / IP / User-Agent / Cookie inspection"),
+        (name = "response", description = "Status / Delay / Redirect / Stream / response-headers control"),
         (name = "auth", description = "HTTP authentication endpoints"),
         (name = "utility", description = "UUID, catch-all, image fixtures")
     )

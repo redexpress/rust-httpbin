@@ -6,7 +6,7 @@ use axum::routing::get;
 use axum::Router;
 
 use crate::state::AppState;
-use crate::utils::image_bytes::{JPEG_BYTES, PNG_BYTES, WEBP_BYTES};
+use crate::utils::image_bytes::{JPEG_BYTES, PNG_BYTES, SVG_BYTES, WEBP_BYTES};
 
 pub fn route() -> Router<AppState> {
     Router::new()
@@ -14,6 +14,7 @@ pub fn route() -> Router<AppState> {
         .route("/image/png", get(serve_png))
         .route("/image/jpeg", get(serve_jpeg))
         .route("/image/webp", get(serve_webp))
+        .route("/image/svg", get(serve_svg))
 }
 
 /// `GET /image[/png]` — returns the embedded PNG with `image/png`.
@@ -32,6 +33,12 @@ pub(crate) async fn serve_jpeg(State(_state): State<AppState>) -> Response {
 #[utoipa::path(get, path = "/image/webp", responses((status = 200, description = "Return a WebP image")))]
 pub(crate) async fn serve_webp(State(_state): State<AppState>) -> Response {
     build_image_response("image/webp", WEBP_BYTES)
+}
+
+/// `GET /image/svg` — returns the embedded SVG with `image/svg+xml`.
+#[utoipa::path(get, path = "/image/svg", responses((status = 200, description = "Return an SVG image")))]
+pub(crate) async fn serve_svg(State(_state): State<AppState>) -> Response {
+    build_image_response("image/svg+xml", SVG_BYTES)
 }
 
 fn build_image_response(content_type: &'static str, bytes: &'static [u8]) -> Response {
@@ -109,5 +116,21 @@ mod tests {
         assert_eq!(status, StatusCode::OK);
         assert_eq!(headers.get(header::CONTENT_TYPE).unwrap(), "image/webp");
         assert_eq!(body, WEBP_BYTES);
+    }
+
+    #[tokio::test]
+    async fn image_svg_returns_svg_bytes() {
+        let (status, headers, body) = get_bytes("/image/svg").await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(headers.get(header::CONTENT_TYPE).unwrap(), "image/svg+xml");
+        let len: usize = headers
+            .get(header::CONTENT_LENGTH)
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .parse()
+            .unwrap();
+        assert_eq!(len, body.len());
+        assert_eq!(body, SVG_BYTES);
     }
 }

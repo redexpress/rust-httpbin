@@ -19,12 +19,12 @@
 
 ## v0.2.0 — Planned
 
-- [ ] Gzip / Brotli compression
-- [ ] Response headers endpoint (`/response-headers`)
-- [ ] Cookies endpoint (`/cookies`)
-- [ ] Image endpoints (`/image`, `/image/png`, …)
-- [ ] Form-encoded data parsing in echo endpoints
-- [ ] Multipart file upload support
+- [x] Gzip / Brotli compression
+- [x] Response headers endpoint (`/response-headers`)
+- [x] Cookies endpoint (`/cookies`)
+- [x] Image endpoints (`/image`, `/image/png`, …)
+- [x] Form-encoded data parsing in echo endpoints
+- [x] Multipart file upload support
 
 ## v1.0.0 — Future
 

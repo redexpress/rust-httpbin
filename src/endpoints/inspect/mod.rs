@@ -1,3 +1,4 @@
+pub(crate) mod cookies;
 pub(crate) mod headers;
 pub(crate) mod ip;
 pub(crate) mod user_agent;
@@ -10,4 +11,5 @@ pub fn routes() -> Router<AppState> {
         .merge(headers::route())
         .merge(ip::route())
         .merge(user_agent::route())
+        .merge(cookies::route())
 }

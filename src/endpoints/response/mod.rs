@@ -1,5 +1,6 @@
 pub(crate) mod delay;
 pub(crate) mod redirect;
+pub(crate) mod response_headers;
 pub(crate) mod status;
 pub(crate) mod stream;
 
@@ -12,4 +13,5 @@ pub fn routes() -> Router<AppState> {
         .merge(delay::route())
         .merge(redirect::route())
         .merge(stream::route())
+        .merge(response_headers::route())
 }

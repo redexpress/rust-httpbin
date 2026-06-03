@@ -1,4 +1,3 @@
-use axum::body::Bytes;
 use axum::extract::{Query, State};
 use axum::http::HeaderMap;
 use axum::{routing::put, Router};
@@ -6,6 +5,7 @@ use std::collections::HashMap;
 
 use crate::endpoints::request::post::build_request_info;
 use crate::state::AppState;
+use crate::utils::request_body::RequestBody;
 use crate::utils::response_utils::ok_json;
 
 pub fn route() -> Router<AppState> {
@@ -19,7 +19,7 @@ pub(crate) async fn handler(
     uri: axum::http::Uri,
     headers: HeaderMap,
     Query(query): Query<HashMap<String, String>>,
-    body: Bytes,
+    body: RequestBody,
 ) -> axum::response::Response {
     let info = build_request_info(&uri, &headers, &query, &body);
     let _ = state;

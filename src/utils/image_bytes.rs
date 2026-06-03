@@ -6,3 +6,4 @@
 pub const PNG_BYTES: &[u8] = include_bytes!("../assets/image.png");
 pub const JPEG_BYTES: &[u8] = include_bytes!("../assets/image.jpg");
 pub const WEBP_BYTES: &[u8] = include_bytes!("../assets/imag.webp"); // sic: filename is "imag"
+pub const SVG_BYTES: &[u8] = include_bytes!("../assets/image.svg");

@@ -1,4 +1,3 @@
-use axum::body::Bytes;
 use axum::extract::{Query, State};
 use axum::http::HeaderMap;
 use axum::{routing::post, Router};
@@ -9,6 +8,7 @@ use crate::state::AppState;
 use crate::utils::client_ip::client_ip;
 use crate::utils::header_utils::{build_full_url, collect_headers};
 use crate::utils::json_utils::{body_as_string, parse_form_body, parse_json_value};
+use crate::utils::request_body::RequestBody;
 use crate::utils::response_utils::ok_json;
 
 pub fn route() -> Router<AppState> {
@@ -22,7 +22,7 @@ pub(crate) async fn handler(
     uri: axum::http::Uri,
     headers: HeaderMap,
     Query(query): Query<HashMap<String, String>>,
-    body: Bytes,
+    body: RequestBody,
 ) -> axum::response::Response {
     let info = build_request_info(&uri, &headers, &query, &body);
     let _ = state;
@@ -33,32 +33,35 @@ pub(crate) fn build_request_info(
     uri: &axum::http::Uri,
     headers: &HeaderMap,
     query: &HashMap<String, String>,
-    body: &Bytes,
+    body: &RequestBody,
 ) -> RequestInfo {
-    let content_type = headers
-        .get("content-type")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("");
+    let content_type = &body.content_type;
 
     let is_json = content_type.contains("application/json");
     let is_form = content_type.contains("application/x-www-form-urlencoded");
+    let is_multipart = body.is_multipart();
 
     let json = if is_json {
-        parse_json_value(body)
+        parse_json_value(&body.bytes)
     } else {
         None
     };
 
-    let form = if is_form {
-        parse_form_body(body)
+    // Form fields: start with urlencoded parse, then merge in any multipart text fields.
+    // Matches httpbin.org behavior — the JSON shape is the same regardless of content type.
+    let mut form = if is_form {
+        parse_form_body(&body.bytes)
     } else {
         HashMap::new()
     };
+    for (k, v) in &body.text_fields {
+        form.insert(k.clone(), v.clone());
+    }
 
-    let data = if is_json || is_form {
+    let data = if is_json || is_form || is_multipart {
         String::new()
     } else {
-        body_as_string(body).unwrap_or_default()
+        body_as_string(&body.bytes).unwrap_or_default()
     };
 
     RequestInfo {
@@ -69,7 +72,7 @@ pub(crate) fn build_request_info(
         json,
         data,
         form,
-        ..Default::default()
+        files: body.files.clone(),
     }
 }
 

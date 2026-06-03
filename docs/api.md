@@ -19,13 +19,17 @@ The spec is generated from the source code via [`utoipa`](https://crates.io/crat
 | `PATCH`  | `/patch`   | Echo the PATCH request |
 | `DELETE` | `/delete`  | Echo the DELETE request|
 
-### Header / IP / UA Inspection
+### Header / IP / UA / Cookies Inspection
 
-| Method | Path          | Description              |
-| ------ | ------------- | ------------------------ |
-| `GET`  | `/headers`    | Return request headers   |
-| `GET`  | `/ip`         | Return client IP         |
-| `GET`  | `/user-agent` | Return User-Agent string |
+| Method | Path                                | Description                              |
+| ------ | ----------------------------------- | ---------------------------------------- |
+| `GET`  | `/headers`                          | Return request headers                   |
+| `GET`  | `/ip`                               | Return client IP                         |
+| `GET`  | `/user-agent`                       | Return User-Agent string                 |
+| `GET`  | `/cookies`                          | Return cookies as a JSON object          |
+| `GET`  | `/cookies/set?name=value&...`       | Set cookies via `Set-Cookie`, 302 to `/cookies` |
+| `GET`  | `/cookies/set/{name}/{value}`       | Set a single cookie, 302 to `/cookies`   |
+| `GET`  | `/cookies/delete?name1&name2`       | Clear cookies with `Max-Age=0`, 302 to `/cookies` |
 
 ### Response Control
 
@@ -35,6 +39,8 @@ The spec is generated from the source code via [`utoipa`](https://crates.io/crat
 | `GET`  | `/delay/:secs`       | Wait N seconds, then reply |
 | `GET`  | `/redirect-to`       | 302 (or custom) redirect   |
 | `GET`  | `/stream/:n`         | Stream N JSON objects (SSE)|
+| `GET`  | `/response-headers?Key=Value&...` | Set response headers from query params, return them as JSON |
+| `POST` | `/response-headers?Key=Value&...` | Same as GET variant       |
 
 ### Auth
 
@@ -54,3 +60,11 @@ The spec is generated from the source code via [`utoipa`](https://crates.io/crat
 | `GET`  | `/image/png`    | Return a PNG image        |
 | `GET`  | `/image/jpeg`   | Return a JPEG image       |
 | `GET`  | `/image/webp`   | Return a WebP image       |
+| `GET`  | `/image/svg`    | Return an SVG image       |
+
+### Transport
+
+| Concern         | Behavior                                                                   |
+| --------------- | -------------------------------------------------------------------------- |
+| Gzip / Brotli   | Responses are compressed when the client sends `Accept-Encoding: gzip`, `br`, or `deflate`. Driven by `tower-http::CompressionLayer` (outermost middleware). |
+| Multipart       | `/post` `/put` `/patch` `/delete` `/anything` accept `multipart/form-data`; file parts populate `files` (filename → size in bytes), text parts merge into `form`. |
